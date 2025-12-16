@@ -1,0 +1,26 @@
+# Development & Debugging
+debugpy           # Essential for attaching a debugger (VS Code) to the running container
+ptvsd             # Legacy debugging support, sometimes useful
+ipdb              # Enhanced interactive Python debugger (better than pdb)
+pudb              # Visual console-based debugger (great for terminal debugging)
+
+# Code Quality & Formatting
+black             # Python code formatter (The Uncompromising Code Formatter)
+isort             # Utility to sort imports alphabetically
+flake8            # Linter to check for PEP8 compliance
+pylint            # Advanced code analysis
+
+# Data Handling & Analysis (Useful for complex reporting or migrations)
+pandas            # Powerful data manipulation and analysis
+openpyxl          # Read/write Excel 2010 xlsx/xlsm files
+xlrd              # Read Excel files (legacy support)
+csvkit            # Suite of utilities for converting to and working with CSV
+
+# API & Integration Testing
+requests          # Elegant and simple HTTP library for Python
+postman-code-generators # Helps if you generate code from Postman
+websocket-client  # For testing WebSocket connections (Odoo uses long-polling/websockets)
+
+# Performance Profiling
+py-spy            # Sampling profiler for Python programs
+memory_profiler   # Monitor memory usage of a python program

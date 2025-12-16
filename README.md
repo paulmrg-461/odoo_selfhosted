@@ -33,6 +33,7 @@ This project provides a Dockerized environment for running Odoo locally, followi
 - `docker-compose.yml`: Defines the Odoo and PostgreSQL services.
 - `config/odoo.conf`: Odoo configuration file (Master password, DB settings, etc.).
 - `addons/`: Directory for custom Odoo modules.
+- `requirements.txt`: Python dependencies for development (debugging, linting, analysis).
 - `ARCHITECTURE.md`: Project architecture and rules.
 
 ## Management Commands
@@ -49,6 +50,12 @@ This project provides a Dockerized environment for running Odoo locally, followi
   ```bash
   docker compose restart
   ```
+- **Install Python Requirements (inside container):**
+  If you need to use the debug tools or extra libraries:
+  ```bash
+  docker compose exec web pip install -r /mnt/extra-addons/requirements.txt
+  ```
+  *(Note: You might need to mount the requirements file or copy it depending on your exact volume setup. For quick use, just run `pip install <package>` inside the container)*
 
 ## Development
 
