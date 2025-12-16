@@ -22,6 +22,12 @@ This project provides a Dockerized environment for running Odoo locally, followi
    - Fill in the database name, email, and password for your admin user.
    - Click "Create Database".
 
+4. **Install Apps (Important):**
+   When you first log in, Odoo is a "blank canvas". To get functionality like POS, Inventory, or Invoicing:
+   - Go to the **Apps** menu on the main dashboard.
+   - Click **Activate** on the apps you need (e.g., *Point of Sale*, *Inventory*, *Accounting*).
+   - Odoo will install them and refresh the page.
+
 ## Project Structure
 
 - `docker-compose.yml`: Defines the Odoo and PostgreSQL services.
