@@ -1,0 +1,8 @@
+.env
+config/odoo.conf
+*.pyc
+__pycache__
+*.log
+.DS_Store
+.vscode/
+.idea/
