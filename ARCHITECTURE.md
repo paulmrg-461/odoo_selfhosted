@@ -8,8 +8,8 @@ This project is a local development environment for Odoo using Docker. It aims t
 
 ## Technology Stack
 - **Application**: Odoo Community Edition
-  - Version: 17.0
-  - Image: `odoo:17.0`
+  - Version: 19.0
+  - Image: `odoo:19.0`
 - **Database**: PostgreSQL
   - Version: 15
   - Image: `postgres:15`
