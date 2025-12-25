@@ -240,6 +240,38 @@ docker compose exec -T db psql -U ${POSTGRES_USER} -d <db_name> -c "SELECT count
 
 - Si ves el warning "invalid addons directory '/mnt/extra-addons'", asegúrate de que `addons/` existe y es legible por UID 1000 (paso 4).
 
+---
+
+### Nota importante: uso correcto de `psql` y error "role -d does not exist"
+
+Si al ejecutar comandos dentro del contenedor `db` ves un error del tipo `role "-d" does not exist` o `role "postgres" does not exist`, normalmente se debe a:
+
+- Orden incorrecta de los flags/argumentos a `psql` (las opciones como `-U` y `-d` deben ir antes del `-c` o del comando). 
+- Problemas de comillas cuando se usa `docker compose exec` (la shell del host interpreta partes del comando).
+
+Regla práctica: siempre pasar las opciones de `psql` primero, luego la base de datos (si aplica) y por último `-c "<SQL o meta-comando>"`.
+
+Ejemplos corregidos (usa `${POSTGRES_USER}` definido en `.env`):
+
+```bash
+# Listar roles
+docker compose exec -T db psql -U "${POSTGRES_USER}" -d postgres -c "\du"
+
+# Listar bases de datos
+docker compose exec -T db psql -U "${POSTGRES_USER}" -d postgres -c "\l"
+
+# Crear rol y base de datos (reemplaza <db_user> <db_pass> <db_name>)
+docker compose exec -T db psql -U "${POSTGRES_USER}" -d postgres -c "CREATE USER <db_user> WITH PASSWORD '<db_pass>';"
+docker compose exec -T db psql -U "${POSTGRES_USER}" -d postgres -c "CREATE DATABASE <db_name> OWNER <db_user>;"
+docker compose exec -T db psql -U "${POSTGRES_USER}" -d <db_name> -c "GRANT ALL PRIVILEGES ON DATABASE <db_name> TO <db_user>;"
+
+# Conectar (ejemplo) para listar tablas en una BD
+docker compose exec -T db psql -U "${POSTGRES_USER}" -d <db_name> -c "\dt"
+```
+
+Consejo: si tu `.env` define `POSTGRES_USER=modware_user`, puedes usar `-U modware_user` directamente. Evita ejecutar `psql` sin `-U` si el rol `postgres` no existe en tu imagen.
+
+
 10) Buenas prácticas
 
 - No uses `admin_passwd` débil en producción.
