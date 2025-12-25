@@ -56,3 +56,72 @@ To add custom modules:
 1. Place your module folder inside the `addons/` directory.
 2. Restart the Odoo container: `docker compose restart web`.
 3. Go to Apps in Odoo, click "Update Apps List", and install your module.
+
+## Pasos iniciales para un nuevo cliente (rápido)
+
+A continuación tienes los pasos y comandos para crear la base de datos, el rol y el usuario inicial de Odoo en este entorno Dockerizado. Reemplaza los nombres/contraseñas donde indico.
+
+1) Fijar la contraseña maestra (admin database password)
+
+- Edita `config/odoo.conf` y asegura la línea:
+   - `admin_passwd = TU_CONTRASENA_MAESTRA`
+- Ejemplo desde el host:
+```bash
+sed -i "s/^admin_passwd.*/admin_passwd = SuperSecreta123/" config/odoo.conf || echo "admin_passwd = SuperSecreta123" >> config/odoo.conf
+```
+
+2) Crear el rol (usuario) y la base de datos PostgreSQL
+
+Reemplaza `odoo_user`, `odoo_pass`, `odoo_db` por tus valores:
+```bash
+docker compose exec -T db psql -U postgres -c "CREATE USER odoo_user WITH PASSWORD 'odoo_pass';"
+docker compose exec -T db psql -U postgres -c "CREATE DATABASE odoo_db OWNER odoo_user;"
+docker compose exec -T db psql -U postgres -d odoo_db -c "GRANT ALL PRIVILEGES ON DATABASE odoo_db TO odoo_user;"
+```
+
+3) Inicializar la base de datos Odoo (instalar `base`)
+
+Esto crea las tablas principales (ir_module_module, ir.http, etc.):
+```bash
+docker compose exec -T web odoo -d odoo_db -i base --without-demo=all --stop-after-init -c /etc/odoo/odoo.conf
+```
+
+4) Crear el usuario interno de Odoo
+
+Opción A — Interfaz web: abre `http://localhost:8069` y crea el usuario desde Configuración → Usuarios.
+
+Opción B — `odoo shell` no interactivo:
+```bash
+docker compose exec -T web odoo shell -d odoo_db -c /etc/odoo/odoo.conf <<'PY'
+from odoo import api, SUPERUSER_ID, registry
+db = 'odoo_db'
+with registry(db).cursor() as cr:
+      env = api.Environment(cr, SUPERUSER_ID, {})
+      user = env['res.users'].create({
+            'name': 'Cliente Demo',
+            'login': 'cliente@example.com',
+            'password': 'ClienteP4ss!',
+      })
+      cr.commit()
+print('Usuario creado:', user.login)
+PY
+```
+
+5) Corregir el warning de `addons` (si aparece: "invalid addons directory '/mnt/extra-addons'")
+
+```bash
+sudo chown -R 1000:1000 addons
+sudo chmod -R u+rwX,go+rX addons
+docker compose restart web
+```
+
+6) Verificaciones útiles
+
+```bash
+docker compose exec -T db psql -U odoo_user -d odoo_db -c "SELECT count(*) FROM ir_module_module;"
+curl -I http://localhost:8069
+```
+
+Notas:
+- Guarda `admin_passwd` en `config/odoo.conf` de forma segura.
+- Para producción: usa contraseñas robustas y backups regulares.
