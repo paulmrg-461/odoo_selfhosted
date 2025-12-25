@@ -72,11 +72,12 @@ sed -i "s/^admin_passwd.*/admin_passwd = SuperSecreta123/" config/odoo.conf || e
 
 2) Crear el rol (usuario) y la base de datos PostgreSQL
 
-Reemplaza `odoo_user`, `odoo_pass`, `odoo_db` por tus valores:
+Reemplaza `odoo_user`, `odoo_pass`, `odoo_db` por tus valores. Usa el superusuario definido en `.env` (variable `POSTGRES_USER`) en lugar de `postgres`:
 ```bash
-docker compose exec -T db psql -U postgres -c "CREATE USER odoo_user WITH PASSWORD 'odoo_pass';"
-docker compose exec -T db psql -U postgres -c "CREATE DATABASE odoo_db OWNER odoo_user;"
-docker compose exec -T db psql -U postgres -d odoo_db -c "GRANT ALL PRIVILEGES ON DATABASE odoo_db TO odoo_user;"
+# Reemplaza valores: <db_user> <db_pass> <db_name>
+docker compose exec -T db psql -U ${POSTGRES_USER} -d postgres -c "CREATE USER <db_user> WITH PASSWORD '<db_pass>';"
+docker compose exec -T db psql -U ${POSTGRES_USER} -d postgres -c "CREATE DATABASE <db_name> OWNER <db_user>;"
+docker compose exec -T db psql -U ${POSTGRES_USER} -d <db_name> -c "GRANT ALL PRIVILEGES ON DATABASE <db_name> TO <db_user>;"
 ```
 
 3) Inicializar la base de datos Odoo (instalar `base`)
